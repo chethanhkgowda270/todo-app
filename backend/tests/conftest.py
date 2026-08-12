@@ -4,6 +4,20 @@ from app import create_app
 from models import db as _db
 
 
+@pytest.fixture(autouse=True)
+def clean_db(app, db):
+    """
+    Runs automatically BEFORE every individual test (not after).
+    Cleaning before, rather than after, means each test doesn't
+    depend on the previous test's cleanup having worked correctly —
+    it's self-sufficient and can't inherit leftover state.
+    """
+    with app.app_context():
+        for table in reversed(db.metadata.sorted_tables):
+            db.session.execute(table.delete())
+        db.session.commit()
+    yield
+
 @pytest.fixture(scope="session")
 def app():
     """
@@ -20,17 +34,3 @@ def app():
     )
     return test_app
 
-
-@pytest.fixture(autouse=True)
-def clean_db(app, db):
-    """
-    Runs automatically BEFORE every individual test (not after).
-    Cleaning before, rather than after, means each test doesn't
-    depend on the previous test's cleanup having worked correctly —
-    it's self-sufficient and can't inherit leftover state.
-    """
-    with app.app_context():
-        for table in reversed(db.metadata.sorted_tables):
-            db.session.execute(table.delete())
-        db.session.commit()
-    yield
