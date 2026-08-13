@@ -2,6 +2,7 @@ import os
 import pytest
 from app import create_app
 from models import db as _db
+from unittest.mock import patch
 
 
 @pytest.fixture(scope="session")
@@ -46,6 +47,15 @@ def clean_db(app, db):
         db.session.commit()
     yield
 
+@pytest.fixture(autouse=True)
+def mock_send_email():
+    """
+    Prevents tests from making real network calls to send email.
+    Without this, register/reset-password routes could hang or fail
+    in CI, where no real mail server is reachable.
+    """
+    with patch("app.send_email") as mock:
+        yield mock
 
 @pytest.fixture
 def client(app):
