@@ -70,4 +70,4 @@ jobs:
         working-directory: ./backend
         env:
           DATABASE_URL: postgresql://ledger_user:ledger_pass@localhost:5432/ledger_test_db
-        run: pytest -v
+        run: pytest -v --timeout=30
