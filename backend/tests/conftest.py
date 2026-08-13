@@ -46,6 +46,8 @@ def clean_db(app, db):
             db.session.execute(table.delete())
         db.session.commit()
     yield
+    with app.app_context():
+        db.session.remove()
 
 @pytest.fixture(autouse=True)
 def mock_send_email():
