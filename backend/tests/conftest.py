@@ -25,12 +25,16 @@ def app():
 @pytest.fixture(scope="session")
 def db(app):
     """
-    Creates all tables once before any tests run, and drops them
-    after the entire test session finishes.
+    Creates all tables once before tests, drops them once after —
+    but does NOT hold an app context open in between. Holding one
+    open for the whole session would prevent Flask's per-request
+    teardown (which cleans up the SQLAlchemy session) from firing
+    during test client calls, causing transactions to pile up.
     """
     with app.app_context():
         _db.create_all()
-        yield _db
+    yield _db
+    with app.app_context():
         _db.drop_all()
 
 
