@@ -13,4 +13,4 @@ COPY . .
 EXPOSE 5000
 
 # gunicorn is a production-grade server — Flask's built-in server isn't meant for real use
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "app:app"]
